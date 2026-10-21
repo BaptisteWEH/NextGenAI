@@ -1,0 +1,4 @@
+# Python virtual environments and caches: local to each machine, never pushed
+.venv/
+**/.venv/
+__pycache__/
