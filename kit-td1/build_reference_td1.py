@@ -83,6 +83,16 @@ CASES = {
 }
 
 
+# Published reference values (reference-values-td1-en, 18 October 2026), used only for the
+# comparison made after our own computation; never as a source of the values written.
+PUBLISHED = {
+    "C01": 792800, "C02": 590320, "C03": 936350, "C04": 2826250, "C05": 38480,
+    "C06": 0, "C07": 13970, "C08": 605580, "C09": 487980, "C10": 558980,
+    "C11": 446690, "C12": 1666490, "C13": 107740, "C14": 0, "C15": 168680,
+    "C16": 376740, "C17": 258180, "C18": 62480, "C19": 1990, "C20": 1106090,
+}
+
+
 def reference_sql(p):
     conditions = []
     if "start" in p:
@@ -184,6 +194,12 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
     print(f"\n{OUT.name} written: {len(rows)} rows, all three computations agree.")
+
+    differing = [r["case_id"] for r in rows if r["revenue_cents"] != PUBLISHED[r["case_id"]]]
+    for case_id in differing:
+        print(f"{case_id} differs from the published value: ours "
+              f"{next(r['revenue_cents'] for r in rows if r['case_id'] == case_id)}, published {PUBLISHED[case_id]}")
+    print(f"Published values: {len(rows) - len(differing)}/{len(rows)} equal.")
 
 
 if __name__ == "__main__":
