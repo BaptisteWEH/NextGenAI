@@ -1,3 +1,22 @@
+"""Build reference-td1.csv: twenty reference queries, executed and independently checked.
+
+Written with coding assistance (Claude), disclosed; every query and value is checked here
+by two computations that share no code with the reference SQL:
+
+1. reference: the SQL stored in reference-td1.csv, run on data/boutique.sqlite opened read-only;
+2. check A: pure Python on the CSV files (csv + datetime, no SQL, own age function);
+3. check B: a second SQL formulation on the base (age from year difference corrected by
+   month-day, products and periods written with other operators).
+
+The file is written only if the three values agree for all twenty questions.
+
+Conventions (consigne-etudiante section 1):
+- period "from S to E": date >= S AND date < E (closed left, open right);
+- completed age 25 on day D: 25th anniversary <= D < 26th anniversary (month and day count);
+  "at the time of the order": D is the calendar day of the order timestamp;
+- revenue excluding VAT: SUM(quantity_product * price), integer cents;
+- 0, not NULL, when nothing matches.
+"""
 import csv
 import hashlib
 import json
