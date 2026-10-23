@@ -69,12 +69,19 @@ Each operator kept their state file (`state-X.jsonl`) to enforce the retry limit
 | E | `openrouter:dots-studio/dots-3-note-preview:free` | 20 (20 + 0) | 0 | 3 140 ms | 11 858 / 3 593 |
 
 All attempts are merged under one header in [traces-td1.csv](../kit-td1/traces-td1.csv)
-(105 rows). The source CSV and JSONL files are kept next to it.
+and [traces-td1.jsonl](../kit-td1/traces-td1.jsonl) (105 rows each, the JSONL concatenates
+`state-A..E.jsonl`). The source CSV and JSONL files are kept next to them.
 
 **Prompt, as used.** We did not change it. It is the `SYSTEM_PROMPT` and the
 `USER_PROMPT_TEMPLATE` of [skeleton-multi-llm-en.py](../kit-td1/skeleton-multi-llm-en.py#L104-L122),
-identical for all models. We checked that every question has one single `prompt_sha256`
-across the 105 calls.
+identical for all models, written out in [prompts-en.md](../kit-td1/prompts-en.md) with the
+fingerprint of each question. We checked that every question has one single `prompt_sha256`
+across the 105 calls, and that recomputing it from the text gives the recorded value.
+
+**Extra run, outside the batch.** Operator C first ran the Dots model by mistake (wrong
+`--models` value): 20 real OpenRouter calls on 2026-10-21, 13:57 to 13:59 UTC. They are kept in
+[extra-runs/](../kit-td1/extra-runs/) and are not counted in the 100 cells or in any result.
+The Cohere batch was then run with new files.
 
 ## Step 3 - Results
 
@@ -150,7 +157,9 @@ Agreement between models is therefore not evidence of correctness. These cases p
 ## Limitations
 
 - One run per cell at temperature 0. We did not measure variability, so these are observations,
-  not error rates.
+  not error rates. The accidental second run of Dots ([extra-runs/](../kit-td1/extra-runs/))
+  hints at it: same prompt, 13/20 instead of 14/20, five questions change verdict (C08, C11,
+  C17, C18, C19). Two runs are not enough to measure a rate.
 - Qwen was evaluated on 18 cells, not 20, because of access failures.
 - The summary template named `inclusionai/ling-3.0-flash-sante:free` for model C (28 September
   list). The model actually called is `cohere/north-mini-code:free`, from the 14 October selection.

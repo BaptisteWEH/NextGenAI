@@ -2,3 +2,21 @@
 .venv/
 **/.venv/
 __pycache__/
+
+# Secrets and local files (from kit-td1/.gitignore): keys live in environment variables only
+.env
+.env.*
+*.env
+.envrc
+*.key
+*.pem
+secrets*
+credentials*
+ready-for-td1.txt
+*.pyc
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
