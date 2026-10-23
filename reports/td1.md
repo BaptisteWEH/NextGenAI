@@ -4,13 +4,13 @@
 
 | Role | Member | Work |
 |---|---|---|
-| A | Edgar Merceron | Batch `groq:openai/gpt-oss-120b` ([traces-A.csv](../kit-td1/traces-A.csv)) |
+| A | Edgar Merceron | Batch `groq:openai/gpt-oss-120b` ([traces-A.csv](../kit-td1/traces-A.csv)); check of the twenty reference queries |
 | B | Baptiste Wehry | Batch `groq:openai/gpt-oss-20b` ([traces-B.csv](../kit-td1/traces-B.csv)) |
 | C | Leo Garcia (Inès) | Batch `openrouter:cohere/north-mini-code:free` ([traces-C.csv](../kit-td1/traces-C.csv)) |
-| D | Nils Demougeot | Batch `groq:qwen/qwen3.8-27b` ([traces-D.csv](../kit-td1/traces-D.csv)) |
+| D | Nils Demougeot | Batch `groq:qwen/qwen3.8-27b` ([traces-D.csv](../kit-td1/traces-D.csv)); the twenty reference queries; step 3 consolidation ([build_step3_td1.py](../kit-td1/build_step3_td1.py)) |
 | E | Sacha Sommier | Batch `openrouter:dots-studio/dots-3-note-preview:free` ([traces-E.csv](../kit-td1/traces-E.csv)) |
-| F | Maxence Milleker | Cross-check, consolidation of the traces and summaries (_to detail_) |
-| G | Timothée Barselo | Cross-check, consolidation of the traces and summaries (_to detail_) |
+| F | Maxence Milleker | Worked on the model batches with the operators |
+| G | Timothée Barselo | Worked on the model batches with the operators |
 
 The sub-group has seven members, so there is no role H.
 
@@ -52,7 +52,8 @@ opened read-only. The published table was used only afterwards, for the comparis
 | Product list | `o.product_id IN (...)` | C13 (`a`, `c`), C19 (`d` only) |
 | Amount | `COALESCE(SUM(quantity_product * price), 0)`, cents excl. VAT | C06 and C14: no order in the period, so 0, not NULL |
 
-**Cross-check between members.** _To complete: who checked which questions._
+**Cross-check between members.** Nils Demougeot (D) wrote the twenty reference queries
+(C01 to C20). Edgar Merceron (A) checked all twenty of them.
 
 ## Step 2 - The five models
 
