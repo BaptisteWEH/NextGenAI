@@ -29,6 +29,9 @@ python3 atelier-routage.py --scenario deferrable
 The kit version of `atelier-routage.py` is the one in commit `f256bbb`, which produced
 `simulator-before-td2.jsonl`.
 
+Both scripts need Python 3 and the standard library only (`argparse`, `csv`, `json`, `collections`,
+`pathlib`). They make no network call, run no SQL and read no key.
+
 ## Rates per family
 
 Rates are given in [routing-rule-td2.md](routing-rule-td2.md#1-what-td-1-measured-correct--cells-last-attempt).
@@ -161,6 +164,30 @@ worth more than the time saved:
 
 The kit order still holds when the request cannot wait, when the refill is after the deadline, or when
 no validated route is coming back. In those cases our `choose` also takes the subscription.
+
+## Cross-review follow-up
+
+Two reviews were pushed on our branch:
+[review-pair-c-by-pair-a.md](review-pair-c-by-pair-a.md) and
+[review-pair-c-by-pair-b.md](review-pair-c-by-pair-b.md).
+
+**Pair B** replayed the three commands with zero diff and checked every family rate against its own scan
+of the traces. It approved the step. Its one suggestion is to use its canary test as a deterministic
+check that needs no reference value. We ran it on branch `Pair_B`: it gives 300 for the C02 and C10
+reference queries, 0 for the three wrong C02 queries, 1500 for north-mini-code on C08 and 100 for qwen
+and dots on C10. We added it to [routing-rule-td2.md](routing-rule-td2.md#3-why-these-checks), with its
+limit: the synthetic customers are built for one reference date.
+
+**Pair A** reviewed the repository as a whole. Our answer, point by point:
+
+| Point raised | What we did |
+|---|---|
+| Documents in three formats, `kit-td1` holding TD1 to TD3, crowded root folder | No change. These are kit files and the shared folder layout (commit `f256bbb`). Renaming them would break the paths of the kit and the links of the TD 1 report. |
+| `skeleton-multi-llm-en.py` is too large | No change in our step. It is the kit skeleton, and only `vote_k_sur_n` is to be completed, by Pair A. |
+| `requirements.txt` looks too small | It lists `requests`, which is all the kit needs. Our two scripts use the standard library only, which we now say in the replay section. |
+| SQL injection risk in `sandbox_sqlite.py` | Not in our step: our scripts run no SQL. The kit opens the database read-only. |
+| API keys | None in our files. `.gitignore` already excludes `.env`, `.env.*`, `.venv/` and `__pycache__/`. |
+| Trace files bloat the history | We keep them. The hand-in asks for the evidence in the repository, and our three outputs weigh under 10 KB each. |
 
 ## Limits
 

@@ -56,7 +56,11 @@ same request (2,000 tokens in, 500 out) on the paid route of the same model: gpt
 **What "reference" means outside the lab.** The lab reference values do not exist in production.
 Here, the reference is the validated exact query of the family (one schema per closed question type),
 run read-only by code. The model's value is delivered only if it equals that value. Same input, same
-output, and the vote never sees it.
+output, and the vote never sees it. For F2 and F2b, Pair B's canary test is a second deterministic check
+that needs no reference value. It runs the model's SQL on four synthetic customers born around the
+reference date, and only the exact age window returns 300 cents. It rejects the 0 of C02 (gpt-oss-20b,
+north-mini-code, dots) and the 100 of C10 (qwen, dots) before the vote (`pair_b_wrong_consensus.py`,
+section 6). It is built for 2026-09-25, so the four birth dates must be rebuilt for each question date.
 
 ## 4. Fixed in advance (policy `pair-c-v1`)
 
