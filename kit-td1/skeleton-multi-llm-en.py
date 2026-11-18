@@ -71,7 +71,8 @@ from typing import Optional
 
 HERE = Path(__file__).resolve().parent
 
-# Layout of the student kit: every resource is next to this file. When the file
+# Layout of the student kit: every resource is next to this file, the TD 1
+# questions and references in TD1/. When the file
 # runs from the repository instead of the kit, the same resources are looked up
 # in the teacher folders (second candidate of each entry).
 PROTOTYPE = HERE / "prototype-orchestrateur"
@@ -80,9 +81,9 @@ RESOURCES = {
     "sandbox": (HERE / "sandbox_sqlite.py", PROTOTYPE / "sandbox_sqlite.py"),
     "schema": (HERE / "schema.sql", PROTOTYPE / "schema.sql"),
     "db": (HERE / "data" / "boutique.sqlite", PROTOTYPE / "data" / "seed-20260925" / "boutique.sqlite"),
-    "questions": (HERE / "questions-td1.json", HERE / "kit-td1" / "questions-td1.json"),
+    "questions": (HERE / "TD1" / "questions-td1.json", HERE / "questions-td1.json"),
     "models": (HERE / "modeles-autorises.json", HERE / "acces-modeles" / "modeles-autorises.json"),
-    "reference": (HERE / "reference-td1.csv", HERE / "kit-td1" / "reference-td1.csv"),
+    "reference": (HERE / "TD1" / "reference-td1.csv", HERE / "reference-td1.csv"),
 }
 
 

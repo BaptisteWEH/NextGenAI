@@ -7,19 +7,19 @@ Pack 2026-10-14-students-1, 14 October 2026. Start with **[Before TD 1](before-t
 | Step | Essential resources |
 |---|---|
 | Prepare | [Environment guide](kit-td1/guide-environnement-etudiant-en.html), [kit contents](kit-td1/README.html) |
-| Read the work | [TD 1 assignment](kit-td1/enonce-td1-en.html), [assessment](assessment-en.html) |
-| Calculate references | [Twenty questions](kit-td1/questions-td1-en.html), [protocol](kit-td1/consigne-etudiante-en.html), [blank reference CSV](kit-td1/reference-td1.csv) |
+| Read the work | [TD 1 assignment](kit-td1/TD1/enonce-td1-en.html), [assessment](assessment-en.html) |
+| Calculate references | [Twenty questions](kit-td1/TD1/questions-td1-en.html), [protocol](kit-td1/consigne-etudiante-en.html), [blank reference CSV](kit-td1/TD1/reference-td1.csv) |
 | Run and read | [Skeleton](kit-td1/skeleton-multi-llm-en.py), [access configuration](kit-td1/modeles-autorises.json), [integrity check](kit-td1/verify-data.py) |
-| Summarise | [Comparison CSV](kit-td1/model-question-comparison-en.csv), [five-model CSV](kit-td1/five-model-summary-en.csv), [fictional example](kit-td1/comparison-example-en.html) |
+| Summarise | [Comparison CSV](kit-td1/TD1/model-question-comparison-en.csv), [five-model CSV](kit-td1/TD1/five-model-summary-en.csv), [fictional example](kit-td1/TD1/comparison-example-en.html) |
 | Hand in | [Hand-in](submission-en.html): the repository after TD 1 |
 
 ## TD 2: vote and route
 
-Read the [TD 2 assignment](kit-td1/enonce-td2-en.html). Use saved TD 1 traces, [the voting workshop](kit-td1/atelier-vote.py), [routing workshop](kit-td1/atelier-routage.py) and [routing worksheet](templates/routing-rule-en.html). No additional network batch is required. These materials are beta.
+Read the [TD 2 assignment](kit-td1/TD2/enonce-td2-en.html). Use saved TD 1 traces, [the voting workshop](kit-td1/TD2/atelier-vote.py), [routing workshop](kit-td1/TD2/atelier-routage.py) and [routing worksheet](templates/routing-rule-en.html). No additional network batch is required. These materials are beta.
 
 ## TD 3: quantify and decide
 
-Read the [TD 3 assignment](kit-td1/enonce-td3-en.html), [cost method](kit-td1/methode-cout-en.html) and [cost worksheet](templates/cost-calculation-en.csv). Compare configurations, including explicit N/A totals when coverage is incomplete, then justify a decision for a named use case. These materials are beta.
+Read the [TD 3 assignment](kit-td1/TD3/enonce-td3-en.html), [cost method](kit-td1/TD3/methode-cout-en.html) and [cost worksheet](templates/cost-calculation-en.csv). Compare configurations, including explicit N/A totals when coverage is incomplete, then justify a decision for a named use case. These materials are beta.
 
 ## References to consult
 

@@ -25,7 +25,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DATA = HERE / "data"
+DATA = HERE.parent / "data"
 OUT = HERE / "reference-td1.csv"
 
 BASE = ("SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents "

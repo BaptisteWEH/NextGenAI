@@ -26,7 +26,7 @@ Allow about 45 minutes for preparation. Finish by Sunday 18 October 2026, inclus
 
 4. **Read TD 1 and bring the saved evidence** (5 min)
    - Read the assignment and locate the reference template, raw traces and two result templates. Bring the saved check and note the remaining allowance of your accounts; no second network run is needed to save proof.
-   - [TD 1 assignment and result templates](kit-td1/enonce-td1-en.html)
+   - [TD 1 assignment and result templates](kit-td1/TD1/enonce-td1-en.html)
    - You see: You can locate the files for each step and explain your assigned model batch. The protocol provides 100 base cells: 60 Groq and 40 OpenRouter, with two different members using OpenRouter.
    - You do not: An unclear file or role: use the assignment and the fictional presentation example. Report a blocked setup before the session.
 
@@ -34,7 +34,7 @@ Allow about 45 minutes for preparation. Finish by Sunday 18 October 2026, inclus
 
 1. **Calculate and check the references** (75 min)
    - Share the twenty queries among the eight members. Execute SQL on the database, record `case_id`, `sql`, `revenue_cents`, then independently check with another member.
-   - [Questions and conventions](kit-td1/questions-td1-en.html)
+   - [Questions and conventions](kit-td1/TD1/questions-td1-en.html)
    - You see: Twenty references checked with the instructor, with the relevant conventions explained. A model answer never supplies a reference amount.
    - You do not: Resolve differences before calling the affected questions. Correct results on the first attempt are fully eligible for R1 level 2.
 
@@ -46,13 +46,13 @@ Allow about 45 minutes for preparation. Finish by Sunday 18 October 2026, inclus
 
 3. **Read selected traces** (35 min within the analysis slots)
    - Read the returned SQL, verdict, error, prompt fingerprint and measurements. Keep every attempt; compare each final result with the independently checked reference.
-   - [TD 1 analysis instructions](kit-td1/enonce-td1-en.html)
+   - [TD 1 analysis instructions](kit-td1/TD1/enonce-td1-en.html)
    - You see: You can explain an instructor-selected trace, a common fingerprint and a missing measurement or retry if present. An absent measurement stays empty.
    - You do not: If your batch has no access failure, the instructor supplies an identified example. Its historical, replayed or simulated nature is recorded separately.
 
 4. **Complete the two summaries** (35 min within the analysis slots)
    - Fill `model-question-comparison-en.csv` and `five-model-summary-en.csv`. The first has one final row per model/question, explanation and raw-trace pointer; show its models x questions pivot at the plenary.
-   - [Templates and fictional example](kit-td1/comparison-example-en.html)
+   - [Templates and fictional example](kit-td1/TD1/comparison-example-en.html)
    - You see: Two CSVs, one entry of each result, causes in the comparison rows or linked notes. The five-model summary has index, dated exact-model prices, access and family results.
    - You do not: Use N/A with a reason for an undocumented paid counterpart. A known cost subtotal is not a complete total. The example below is entirely fictional.
 

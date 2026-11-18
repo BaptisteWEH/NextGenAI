@@ -1,6 +1,6 @@
 # TD 2 - The quorum, then the routing rule
 
-> Beta. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../before-td1-en.html).
+> Beta. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../../before-td1-en.html).
 
 **Module: Trustworthy generative AI. Session 2 (18 November), 13:30 to 18:00.**
 
@@ -33,7 +33,7 @@ routing rule is written and exercised on a simulator.
   (OpenRouter), `qwen/qwen3.8-27b` (Groq).
 - `atelier-routage.py`: a routing simulator on three fictitious resources and
   seven scenarios, without any call to a provider.
-- [portefeuille-modeles-en](portefeuille-modeles-en.html) and its CSV, for the prices and the access routes.
+- [portefeuille-modeles-en](../portefeuille-modeles-en.html) and its CSV, for the prices and the access routes.
 - Your stored TD 1 traces. An optional new experiment uses a separate allocation
   agreed with the instructor and current account allowances.
 
@@ -69,8 +69,8 @@ Complete `Orchestrateur.vote_k_sur_n(self, traces_question, k)` in
 Exercise the vote:
 
 ```bash
-python3 atelier-vote.py                                   # four synthetic examples, no network
-python3 atelier-vote.py --traces traces-td1.csv --case C02 # the real traces of one question
+python3 TD2/atelier-vote.py                                   # four synthetic examples, no network
+python3 TD2/atelier-vote.py --traces TD1/traces-td1.csv --case C02 # the real traces of one question
 ```
 
 The second call takes, for each member of the panel, its last attempt on the
@@ -114,8 +114,8 @@ Each line cites the cells of the TD 1 table that justify it. Keep simple period 
 Then launch the simulator:
 
 ```bash
-python3 atelier-routage.py                       # the seven scenarios
-python3 atelier-routage.py --scenario deferrable # one scenario
+python3 TD2/atelier-routage.py                       # the seven scenarios
+python3 TD2/atelier-routage.py --scenario deferrable # one scenario
 ```
 
 Read each decision (`run`, `defer`, `abstain`), its resource and its reason.

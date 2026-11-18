@@ -16,7 +16,7 @@ Pack 2026-10-14-students-1, 14 October 2026. One repository per sub-group: use a
 | `README.md` | Sub-group, members, pack version, database hash, environment, commands, completed work and open blocks |
 | `reports/td1.md` | Session report: completed work, successes, failures, evidence, causes, limits, contributions and next steps |
 
-Display a models x questions pivot of the long comparison CSV; submit that CSV without a second manual entry. Put causes in its `explanation` column or in linked notes, with raw-file and cell identifiers. See the [fictional example](kit-td1/comparison-example-en.html). The [template directory](templates/README-en.html) supplies blank forms.
+Display a models x questions pivot of the long comparison CSV; submit that CSV without a second manual entry. Put causes in its `explanation` column or in linked notes, with raw-file and cell identifiers. See the [fictional example](kit-td1/TD1/comparison-example-en.html). The [template directory](templates/README-en.html) supplies blank forms.
 
 ### After TD 2
 

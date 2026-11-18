@@ -1,6 +1,6 @@
 # TD 3 - Quantifying and deciding
 
-> Beta. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../before-td1-en.html).
+> Beta. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../../before-td1-en.html).
 
 **Module: Trustworthy generative AI. Session 3 (11 December), 13:30 to 18:00.**
 
@@ -26,7 +26,7 @@ your three slides are presented and your repository is checked.
   routing rule and the simulator outputs.
 - [methode-cout-en](methode-cout-en.html): the guided method, the dated prices of the paid routes
   of the kit models, the configuration table to fill in.
-- [portefeuille-modeles-en](portefeuille-modeles-en.html) and its CSV: price per million tokens and access
+- [portefeuille-modeles-en](../portefeuille-modeles-en.html) and its CSV: price per million tokens and access
   routes of the sixty pairs.
 - The assessment sheet, on your table since TD 1: nine outcomes, three per session, each marked 0, 1 or 2.
 

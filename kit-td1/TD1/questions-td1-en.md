@@ -1,6 +1,6 @@
 # The twenty questions of TD 1
 
-> Final. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../before-td1-en.html).
+> Final. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../../before-td1-en.html).
 
 The base (`data/boutique.sqlite`, seed 20260925) and these questions are the same
 for every sub-group. For each question, write one SQLite `SELECT` that returns
@@ -8,7 +8,7 @@ one row and one column named `revenue_cents`, run it on the base and independent
 check it, then record the query and its value in `reference-td1.csv`. A model's
 numerical answer never supplies the reference. The conventions
 that fix the meaning of every question (period bounds, completed age, unit
-price and quantity, 0 instead of NULL) are in [consigne-etudiante-en](consigne-etudiante-en.html),
+price and quantity, 0 instead of NULL) are in [consigne-etudiante-en](../consigne-etudiante-en.html),
 section 1; they are binding for your queries as for the models.
 
 Every parameter is written in the question: timestamps of the period, reference

@@ -4,11 +4,11 @@
 
 | Role | Member | Work |
 |---|---|---|
-| A | Edgar Merceron | Batch `groq:openai/gpt-oss-120b` ([traces-A.csv](../kit-td1/traces-A.csv)); check of the twenty reference queries |
-| B | Baptiste Wehry | Batch `groq:openai/gpt-oss-20b` ([traces-B.csv](../kit-td1/traces-B.csv)) |
-| C | Leo Garcia (Inès) | Batch `openrouter:cohere/north-mini-code:free` ([traces-C.csv](../kit-td1/traces-C.csv)) |
-| D | Nils Demougeot | Batch `groq:qwen/qwen3.8-27b` ([traces-D.csv](../kit-td1/traces-D.csv)); the twenty reference queries; step 3 consolidation ([build_step3_td1.py](../kit-td1/build_step3_td1.py)) |
-| E | Sacha Sommier | Batch `openrouter:dots-studio/dots-3-note-preview:free` ([traces-E.csv](../kit-td1/traces-E.csv)) |
+| A | Edgar Merceron | Batch `groq:openai/gpt-oss-120b` ([traces-A.csv](../kit-td1/TD1/traces-A.csv)); check of the twenty reference queries |
+| B | Baptiste Wehry | Batch `groq:openai/gpt-oss-20b` ([traces-B.csv](../kit-td1/TD1/traces-B.csv)) |
+| C | Leo Garcia (Inès) | Batch `openrouter:cohere/north-mini-code:free` ([traces-C.csv](../kit-td1/TD1/traces-C.csv)) |
+| D | Nils Demougeot | Batch `groq:qwen/qwen3.8-27b` ([traces-D.csv](../kit-td1/TD1/traces-D.csv)); the twenty reference queries; step 3 consolidation ([build_step3_td1.py](../kit-td1/TD1/build_step3_td1.py)) |
+| E | Sacha Sommier | Batch `openrouter:dots-studio/dots-3-note-preview:free` ([traces-E.csv](../kit-td1/TD1/traces-E.csv)) |
 | F | Maxence Milleker | Worked on the model batches with the operators |
 | G | Timothée Barselo | Worked on the model batches with the operators |
 
@@ -23,13 +23,13 @@ All rows are **real** calls made on 2026-10-21. This report uses no replayed or 
 
 ## Step 1 - Reference values
 
-**Result.** [reference-td1.csv](../kit-td1/reference-td1.csv) holds twenty queries,
+**Result.** [reference-td1.csv](../kit-td1/TD1/reference-td1.csv) holds twenty queries,
 each with its value. All twenty values equal the published reference values
 (reference-values-td1-en, 18 October 2026): **20/20, no difference, so there was no cause to correct.**
 
 **Method.** The values come from our own queries, run on `data/boutique.sqlite`
 opened read-only. The published table was used only afterwards, for the comparison.
-[build_reference_td1.py](../kit-td1/build_reference_td1.py) does the following:
+[build_reference_td1.py](../kit-td1/TD1/build_reference_td1.py) does the following:
 
 1. It checks the SHA-256 fingerprints of the base and the CSV files against `data/manifest.json`.
 2. It runs the reference query for each question. It checks that each query returns
@@ -69,26 +69,26 @@ Each operator kept their state file (`state-X.jsonl`) to enforce the retry limit
 | D | `groq:qwen/qwen3.8-27b` | 24 (20 + 4) | 6 | 539 ms | 11 348 / 2 488 |
 | E | `openrouter:dots-studio/dots-3-note-preview:free` | 20 (20 + 0) | 0 | 3 140 ms | 11 858 / 3 593 |
 
-All attempts are merged under one header in [traces-td1.csv](../kit-td1/traces-td1.csv)
-and [traces-td1.jsonl](../kit-td1/traces-td1.jsonl) (105 rows each, the JSONL concatenates
+All attempts are merged under one header in [traces-td1.csv](../kit-td1/TD1/traces-td1.csv)
+and [traces-td1.jsonl](../kit-td1/TD1/traces-td1.jsonl) (105 rows each, the JSONL concatenates
 `state-A..E.jsonl`). The source CSV and JSONL files are kept next to them.
 
 **Prompt, as used.** We did not change it. It is the `SYSTEM_PROMPT` and the
 `USER_PROMPT_TEMPLATE` of [skeleton-multi-llm-en.py](../kit-td1/skeleton-multi-llm-en.py#L104-L122),
-identical for all models, written out in [prompts-en.md](../kit-td1/prompts-en.md) with the
+identical for all models, written out in [prompts-en.md](../kit-td1/TD1/prompts-en.md) with the
 fingerprint of each question. We checked that every question has one single `prompt_sha256`
 across the 105 calls, and that recomputing it from the text gives the recorded value.
 
 **Extra run, outside the batch.** Operator C first ran the Dots model by mistake (wrong
 `--models` value): 20 real OpenRouter calls on 2026-10-21, 13:57 to 13:59 UTC. They are kept in
-[extra-runs/](../kit-td1/extra-runs/) and are not counted in the 100 cells or in any result.
+[extra-runs/](../kit-td1/TD1/extra-runs/) and are not counted in the 100 cells or in any result.
 The Cohere batch was then run with new files.
 
 ## Step 3 - Results
 
 Final status per model and question (last attempt). The data is in
-[model-question-pivot-td1.csv](../kit-td1/model-question-pivot-td1.csv), and the long form with one
-explanation per cell is in [model-question-comparison-en.csv](../kit-td1/model-question-comparison-en.csv).
+[model-question-pivot-td1.csv](../kit-td1/TD1/model-question-pivot-td1.csv), and the long form with one
+explanation per cell is in [model-question-comparison-en.csv](../kit-td1/TD1/model-question-comparison-en.csv).
 
 | Model | C02 | C08 | C09 | C10 | C11 | C15 | C16 | C17 | C19 | C20 | Correct |
 |---|---|---|---|---|---|---|---|---|---|---|---:|
@@ -112,7 +112,7 @@ The other ten questions (C01, C03-C07, C12-C14, C18) are correct for all five mo
 | E dots-3-note | 6/6 | 1/5 | 4/4 | 3/5 |
 
 The details, with index, prices and access for each model, are in
-[five-model-summary-en.csv](../kit-td1/five-model-summary-en.csv).
+[five-model-summary-en.csv](../kit-td1/TD1/five-model-summary-en.csv).
 
 ### Causes of failure, read from the SQL of the traces
 
@@ -158,7 +158,7 @@ Agreement between models is therefore not evidence of correctness. These cases p
 ## Limitations
 
 - One run per cell at temperature 0. We did not measure variability, so these are observations,
-  not error rates. The accidental second run of Dots ([extra-runs/](../kit-td1/extra-runs/))
+  not error rates. The accidental second run of Dots ([extra-runs/](../kit-td1/TD1/extra-runs/))
   hints at it: same prompt, 13/20 instead of 14/20, five questions change verdict (C08, C11,
   C17, C18, C19). Two runs are not enough to measure a rate.
 - Qwen was evaluated on 18 cells, not 20, because of access failures.
@@ -176,9 +176,9 @@ Agreement between models is therefore not evidence of correctness. These cases p
 
 ## Code and AI disclosure
 
-- [build_reference_td1.py](../kit-td1/build_reference_td1.py) builds the reference with its two
+- [build_reference_td1.py](../kit-td1/TD1/build_reference_td1.py) builds the reference with its two
   independent checks.
-- [build_step3_td1.py](../kit-td1/build_step3_td1.py) merges the traces and completes the
+- [build_step3_td1.py](../kit-td1/TD1/build_step3_td1.py) merges the traces and completes the
   comparison, the summary and the pivot.
 - We wrote both scripts with a coding assistant (Claude). We read and checked the code and the
   explanations against the SQL and error fields of the traces. No reference value comes from a model.

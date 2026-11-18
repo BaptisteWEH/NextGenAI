@@ -41,9 +41,9 @@ python build_step3_td1.py
 
 ## Completed work
 
-TD 1: [reference-td1.csv](kit-td1/reference-td1.csv), [traces-td1.csv](kit-td1/traces-td1.csv),
-[traces-td1.jsonl](kit-td1/traces-td1.jsonl), [model-question-comparison-en.csv](kit-td1/model-question-comparison-en.csv),
-[five-model-summary-en.csv](kit-td1/five-model-summary-en.csv), [prompts-en.md](kit-td1/prompts-en.md),
+TD 1: [reference-td1.csv](kit-td1/TD1/reference-td1.csv), [traces-td1.csv](kit-td1/TD1/traces-td1.csv),
+[traces-td1.jsonl](kit-td1/TD1/traces-td1.jsonl), [model-question-comparison-en.csv](kit-td1/TD1/model-question-comparison-en.csv),
+[five-model-summary-en.csv](kit-td1/TD1/five-model-summary-en.csv), [prompts-en.md](kit-td1/TD1/prompts-en.md),
 [reports/td1.md](reports/td1.md).
 
 ## Open blocks

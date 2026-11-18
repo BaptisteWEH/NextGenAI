@@ -221,7 +221,7 @@ Use one public Git repository per sub-group throughout TD 1, TD 2 and TD 3. At t
 
 After each TD, update the same Moodle hand-in entry with the full repository URL, the session's full commit hash and a link to its report at that commit. Retain previous TD entries. The repository must be readable without signing in from its creation; the hand-in dates are announced in Moodle.
 
-For TD 1, submit the raw CSV and JSONL attempts, your executed and independently checked `reference-td1.csv`, and two summaries: [model-question-comparison-en.csv](model-question-comparison-en.csv) and [five-model-summary-en.csv](five-model-summary-en.csv). The [fictional example](comparison-example-en.md) defines the columns. The long comparison CSV holds one final result per model/question, its explanation and raw-trace reference. Display its pivot as the models x questions matrix; do not enter the same work twice. Causes belong in its rows or linked notes.
+For TD 1, submit the raw CSV and JSONL attempts, your executed and independently checked `reference-td1.csv`, and two summaries: [model-question-comparison-en.csv](TD1/model-question-comparison-en.csv) and [five-model-summary-en.csv](TD1/five-model-summary-en.csv). The [fictional example](TD1/comparison-example-en.md) defines the columns. The long comparison CSV holds one final result per model/question, its explanation and raw-trace reference. Display its pivot as the models x questions matrix; do not enter the same work twice. Causes belong in its rows or linked notes.
 
 Coding assistance is proposed with declared use and verified, explained code, pending school approval. A reference amount comes from SQL execution and independent checking, never from accepting a model's numerical answer.
 
@@ -239,7 +239,7 @@ If no access has failed, R3 can use an identified instructor-supplied example. I
 
 ## 8. The twenty questions
 
-Same list as [questions-td1-en](questions-td1-en.html). For each question, one SQLite `SELECT`
+Same list as [questions-td1-en](TD1/questions-td1-en.html). For each question, one SQLite `SELECT`
 returning one row and one column `revenue_cents`, executed on the database and independently checked,
 recorded with its value in `reference-td1.csv`. Every parameter is in the
 question; the conventions of section 1 fix its meaning.

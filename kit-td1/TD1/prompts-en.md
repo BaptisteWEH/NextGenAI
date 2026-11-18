@@ -5,7 +5,7 @@ Sub-group DIA3-3, session of 21 October 2026, pack 2026-10-14-students-1.
 ## Experiment prompt
 
 All five models received the same prompt: the `SYSTEM_PROMPT` and `USER_PROMPT_TEMPLATE`
-of [skeleton-multi-llm-en.py](skeleton-multi-llm-en.py#L104-L121), **unchanged** since the
+of [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py#L104-L121), **unchanged** since the
 kit was added to the repository (commit `71cc991`). There is **no variant**: each question
 has one single `prompt_sha256` across the 105 calls of [traces-td1.csv](traces-td1.csv).
 
@@ -17,7 +17,7 @@ You write SQLite queries for a small e-commerce database. Reply with exactly one
 
 ### User template
 
-`{schema}` is replaced by the content of [schema.sql](schema.sql) (stripped), and `{question}`
+`{schema}` is replaced by the content of [schema.sql](../schema.sql) (stripped), and `{question}`
 by the question text of [questions-td1.json](questions-td1.json).
 
 ````text
@@ -70,7 +70,7 @@ recorded in every trace line.
 
 ### Call parameters
 
-From [modeles-autorises.json](modeles-autorises.json): temperature 0; output cap 1 024 tokens
+From [modeles-autorises.json](../modeles-autorises.json): temperature 0; output cap 1 024 tokens
 (1 000 for `qwen/qwen3.8-27b`); `reasoning_effort` low for the two GPT-OSS models, none for
 Qwen; `reasoning.enabled` false for the two OpenRouter models; 45 s timeout, 3 s between
 requests, at most one retry per cell.
@@ -79,5 +79,5 @@ requests, at most one retry per cell.
 
 The scripts [build_reference_td1.py](build_reference_td1.py) and
 [build_step3_td1.py](build_step3_td1.py) were written with a coding assistant (Claude), as
-disclosed in [reports/td1.md](../reports/td1.md). No model output was used as a reference
+disclosed in [reports/td1.md](../../reports/td1.md). No model output was used as a reference
 value or as a trace.

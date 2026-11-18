@@ -75,8 +75,8 @@ session and keep its files together, without renaming or moving any of them:
   files and `data/manifest.json`, which carries their SHA-256 fingerprints.
   There is no generation script: every sub-group works on the same base, byte
   for byte, and never modifies it;
-- the assignment [enonce-td1-en](enonce-td1-en.html), the protocol [consigne-etudiante-en](consigne-etudiante-en.html)
-  and the twenty questions [questions-td1-en](questions-td1-en.html), with the template
+- the assignment [enonce-td1-en](TD1/enonce-td1-en.html), the protocol [consigne-etudiante-en](consigne-etudiante-en.html)
+  and the twenty questions [questions-td1-en](TD1/questions-td1-en.html), with the template
   `reference-td1.csv` that you fill in during the session;
 - the orchestrator skeleton `skeleton-multi-llm-en.py` and its sandbox
   `sandbox_sqlite.py`;
