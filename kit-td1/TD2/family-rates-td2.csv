@@ -1,0 +1,26 @@
+family,model,correct,cells,rate,cases,not_correct
+F1,gpt-oss-120b,6,6,6/6,C01 C04 C05 C06 C07 C20,
+F1,gpt-oss-20b,6,6,6/6,C01 C04 C05 C06 C07 C20,
+F1,north-mini-code,6,6,6/6,C01 C04 C05 C06 C07 C20,
+F1,qwen3.8-27b,5,6,5/6,C01 C04 C05 C06 C07 C20,C20:not_executed
+F1,dots-3-note,6,6,6/6,C01 C04 C05 C06 C07 C20,
+F2,gpt-oss-120b,3,4,3/4,C02 C08 C09 C11,C11:incorrect
+F2,gpt-oss-20b,2,4,2/4,C02 C08 C09 C11,C02:incorrect C11:incorrect
+F2,north-mini-code,0,4,0/4,C02 C08 C09 C11,C02:incorrect C08:incorrect C09:sql_invalid C11:incorrect
+F2,qwen3.8-27b,4,4,4/4,C02 C08 C09 C11,
+F2,dots-3-note,1,4,1/4,C02 C08 C09 C11,C02:incorrect C09:incorrect C11:sql_invalid
+F2b,gpt-oss-120b,1,1,1/1,C10,
+F2b,gpt-oss-20b,1,1,1/1,C10,
+F2b,north-mini-code,0,1,0/1,C10,C10:sql_invalid
+F2b,qwen3.8-27b,0,1,0/1,C10,C10:incorrect
+F2b,dots-3-note,0,1,0/1,C10,C10:incorrect
+F3,gpt-oss-120b,4,4,4/4,C03 C12 C13 C14,
+F3,gpt-oss-20b,4,4,4/4,C03 C12 C13 C14,
+F3,north-mini-code,4,4,4/4,C03 C12 C13 C14,
+F3,qwen3.8-27b,4,4,4/4,C03 C12 C13 C14,
+F3,dots-3-note,4,4,4/4,C03 C12 C13 C14,
+combined,gpt-oss-120b,5,5,5/5,C15 C16 C17 C18 C19,
+combined,gpt-oss-20b,5,5,5/5,C15 C16 C17 C18 C19,
+combined,north-mini-code,2,5,2/5,C15 C16 C17 C18 C19,C15:incorrect C17:incorrect C19:incorrect
+combined,qwen3.8-27b,1,5,1/5,C15 C16 C17 C18 C19,C15:incorrect C16:not_executed C17:incorrect C19:incorrect
+combined,dots-3-note,3,5,3/5,C15 C16 C17 C18 C19,C15:incorrect C19:sql_invalid
