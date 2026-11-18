@@ -1,0 +1,6 @@
+operator,model_id,C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20,correct
+A,groq:openai/gpt-oss-120b,correct,correct,correct,correct,correct,correct,correct,correct,correct,correct,incorrect,correct,correct,correct,correct,correct,correct,correct,correct,correct,19/20
+B,groq:openai/gpt-oss-20b,correct,incorrect,correct,correct,correct,correct,correct,correct,correct,correct,incorrect,correct,correct,correct,correct,correct,correct,correct,correct,correct,18/20
+C,openrouter:cohere/north-mini-code:free,correct,incorrect,correct,correct,correct,correct,correct,incorrect,sql_invalid,sql_invalid,incorrect,correct,correct,correct,incorrect,correct,incorrect,correct,incorrect,correct,12/20
+D,groq:qwen/qwen3.8-27b,correct,correct,correct,correct,correct,correct,correct,correct,correct,incorrect,correct,correct,correct,correct,incorrect,not_executed,incorrect,correct,incorrect,not_executed,14/20
+E,openrouter:dots-studio/dots-3-note-preview:free,correct,incorrect,correct,correct,correct,correct,correct,correct,incorrect,incorrect,sql_invalid,correct,correct,correct,incorrect,correct,correct,correct,sql_invalid,correct,14/20
