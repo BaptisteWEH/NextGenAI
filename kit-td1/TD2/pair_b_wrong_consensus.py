@@ -7,15 +7,18 @@ No network call, no API key.
 1. Scans all 100 cells of the TD 1 batch across the 5 models to find every question
    where at least two models return the same wrong value (`verdict == 'incorrect'`).
 2. Evaluates both the fixed 2-of-3 panel (`atelier-vote.py`) and the 3-of-5 panel
-   (all 5 TD 1 models) on each identified case (`C02` and `C10`).
+   (all 5 TD 1 models) on each identified case (`C02` and `C10`). Uses Pair A's
+   `Orchestrateur.vote_k_sur_n` when available, with the local contract implementation
+   as fallback, and verifies they agree.
 3. Executes the reference SQL, the faulty model SQL queries and the delta diagnostic
    SQL queries on `data/boutique.sqlite` for:
-   - Case 1 (Real batch): C02 (shared wrong value 0 vs reference 590320 cents)
-   - Case 2 (Real batch): C10 (shared wrong value 119410 vs reference 558980 cents)
-   - Historical case: DEMO-SQL-C11 (shared wrong value 0 vs reference 446690 cents)
-4. Executes the DEMO-VOTE one-row toy table boundary illustration (`>` vs `>=`).
-5. Demonstrates an independent binary-bitmask canary check (100, 200, 400, 800 cents)
-   that detects shared SQL boundary and completed-age errors before trusting a quorum.
+   - Case 1 (Real batch, wrong consensus in 3-of-5): C02 (shared wrong value 0 vs reference 590320 cents)
+   - Case 2 (Real batch, shared wrong value refused by both quorums): C10 (119410 vs reference 558980 cents)
+   - Instructor-supplied historical pilot case: DEMO-SQL-C11 (shared wrong value 0 vs reference 446690 cents)
+4. Executes the DEMO-VOTE one-row toy table boundary illustration (`>` vs `>=`) using
+   synthetic proposal labels (`synthetic:P1`, `synthetic:P2`, `synthetic:P3`).
+5. Demonstrates a targeted binary-bitmask canary check (100, 200, 400, 800 cents),
+   calibrated per reference date (`2026-09-25` for C02/C10 and `2026-12-01` for DEMO-SQL-C11).
 
 Usage from `kit-td1/TD2/` (or from repo root):
     python3 pair_b_wrong_consensus.py --export-csv
@@ -25,10 +28,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 import json
 import sqlite3
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
 KIT_ROOT = HERE.parent
@@ -59,8 +65,8 @@ def connect_ro(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def run_k_of_n(proposals: list[dict], k: int) -> dict:
-    """Strict majority k-of-n vote matching the TD 2 contract."""
+def run_k_of_n_fallback(proposals: list[dict], k: int) -> dict:
+    """Strict majority k-of-n vote matching the TD 2 Step 1 contract."""
     n = len(proposals)
     if not (n // 2 < k <= n):
         raise ValueError(f"k={k} is not a strict majority of n={n}")
@@ -89,6 +95,34 @@ def run_k_of_n(proposals: list[dict], k: int) -> dict:
     return {"consensus": False, "value": None, "votes": max_votes, "models": []}
 
 
+def run_k_of_n(proposals: list[dict], k: int) -> dict:
+    """Use Pair A's Orchestrateur.vote_k_sur_n if available in TD2 or kit root, else fallback."""
+    expected = run_k_of_n_fallback(proposals, k)
+    for candidate in (HERE / "skeleton-multi-llm-en.py", KIT_ROOT / "skeleton-multi-llm-en.py"):
+        if not candidate.exists():
+            continue
+        try:
+            spec = importlib.util.spec_from_file_location("pair_a_skeleton", candidate)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = module
+            spec.loader.exec_module(module)
+            ns_props = [
+                SimpleNamespace(
+                    provider=p["provider"],
+                    model_requested=p["model_requested"],
+                    value=p["value"],
+                    verdict=p["verdict"],
+                )
+                for p in proposals
+            ]
+            res = module.Orchestrateur.vote_k_sur_n(None, ns_props, k)
+            assert res == expected, f"Mismatch between Pair A vote_k_sur_n ({res}) and contract ({expected})"
+            return res
+        except NotImplementedError:
+            continue
+    return expected
+
+
 def build_panel_proposals(latest_by_cell: dict, case_id: str, panel: list[tuple[str, str]]) -> list[dict]:
     proposals = []
     for provider, model in panel:
@@ -104,6 +138,32 @@ def build_panel_proposals(latest_by_cell: dict, case_id: str, panel: list[tuple[
             "csv_line": row.get("_csv_line"),
         })
     return proposals
+
+
+def build_canary_db(ref_date: str, k1_birth: str, k2_birth: str, k3_birth: str, k4_birth: str) -> sqlite3.Connection:
+    """Create a 4-row binary-bitmask canary database calibrated for a specific reference date."""
+    canary = sqlite3.connect(":memory:")
+    canary.executescript(f"""
+        CREATE TABLE product (product_id TEXT PRIMARY KEY, price INTEGER NOT NULL);
+        CREATE TABLE customers (customer_id TEXT PRIMARY KEY, insert_date TEXT NOT NULL, birth_date TEXT NOT NULL);
+        CREATE TABLE orders (date TEXT NOT NULL, order_id TEXT NOT NULL, customer_id TEXT NOT NULL, product_id TEXT NOT NULL, quantity_product INTEGER NOT NULL);
+        INSERT INTO product VALUES ('a', 1);
+        -- Bit 0 (100 cts) K1: turns 25 on ref_date (Cohort 1)     -> MUST INCLUDE
+        -- Bit 1 (200 cts) K2: turns 26 day after ref_date (Coh 2) -> MUST INCLUDE
+        -- Bit 2 (400 cts) K3: turns 26 on ref_date (aged 26)      -> MUST EXCLUDE
+        -- Bit 3 (800 cts) K4: turns 25 day after ref_date (24)    -> MUST EXCLUDE
+        INSERT INTO customers VALUES
+            ('K1', '2025-01-01 00:00:00', '{k1_birth}'),
+            ('K2', '2025-01-01 00:00:00', '{k2_birth}'),
+            ('K3', '2025-01-01 00:00:00', '{k3_birth}'),
+            ('K4', '2025-01-01 00:00:00', '{k4_birth}');
+        INSERT INTO orders VALUES
+            ('{ref_date} 12:00:00', 'O1', 'K1', 'a', 100),
+            ('{ref_date} 12:00:00', 'O2', 'K2', 'a', 200),
+            ('{ref_date} 12:00:00', 'O3', 'K3', 'a', 400),
+            ('{ref_date} 12:00:00', 'O4', 'K4', 'a', 800);
+    """)
+    return canary
 
 
 def main() -> None:
@@ -235,7 +295,7 @@ def main() -> None:
                 ])
 
     print("\n" + "=" * 78)
-    print("4. HISTORICAL SHOP-DATABASE CASE: DEMO-SQL-C11 ON data/boutique.sqlite")
+    print("4. INSTRUCTOR-SUPPLIED HISTORICAL CASE: DEMO-SQL-C11 ON data/boutique.sqlite")
     print("=" * 78)
     q_m1 = """
     SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
@@ -254,8 +314,8 @@ def main() -> None:
     """
     v_m1 = conn.execute(q_m1).fetchone()["revenue_cents"]
     v_m2 = conn.execute(q_m2).fetchone()["revenue_cents"]
-    print(f"  M1 (gpt-oss-20b pilot) result = {v_m1} cents")
-    print(f"  M2 (north-mini-code pilot) result = {v_m2} cents")
+    print(f"  M1 (gpt-oss-20b historical pilot) result = {v_m1} cents")
+    print(f"  M2 (north-mini-code historical pilot) result = {v_m2} cents")
     q_c11_delta = """
     SELECT c.customer_id,
            c.birth_date,
@@ -288,62 +348,55 @@ def main() -> None:
     v_right = toy.execute(
         "SELECT COALESCE(SUM(amount_cents), 0) FROM sales WHERE sale_date >= '2026-01-01' AND sale_date < '2026-01-02';"
     ).fetchone()[0]
+    # Constructed teaching proposals labeled synthetic:P1..P3, never mixed with real model outputs
     demo_proposals = [
-        {"provider": "groq", "model_requested": "openai/gpt-oss-120b", "value": v_wrong, "verdict": "executed"},
-        {"provider": "openrouter", "model_requested": "cohere/north-mini-code:free", "value": v_wrong, "verdict": "executed"},
-        {"provider": "groq", "model_requested": "qwen/qwen3.8-27b", "value": v_right, "verdict": "executed"},
+        {"provider": "synthetic", "model_requested": "P1", "value": v_wrong, "verdict": "executed"},
+        {"provider": "synthetic", "model_requested": "P2", "value": v_wrong, "verdict": "executed"},
+        {"provider": "synthetic", "model_requested": "P3", "value": v_right, "verdict": "executed"},
     ]
     print(f"  Variant 1 (`sale_date >  '2026-01-01'`): {v_wrong} cents (excludes boundary sale on 2026-01-01)")
     print(f"  Variant 2 (`sale_date >= '2026-01-01'`): {v_right} cents (includes boundary sale on 2026-01-01)")
     print(f"  2-of-3 quorum on [{v_wrong}, {v_wrong}, {v_right}] -> {json.dumps(run_k_of_n(demo_proposals, 2))} vs reference = 100")
 
     print("\n" + "=" * 78)
-    print("6. INDEPENDENT CHECK: BINARY-BITMASK CANARY TEST (100, 200, 400, 800 cents)")
+    print("6. TARGETED CHECK: BINARY-BITMASK CANARY TEST (100, 200, 400, 800 cents)")
     print("=" * 78)
-    canary = sqlite3.connect(":memory:")
-    canary.executescript("""
-        CREATE TABLE product (product_id TEXT PRIMARY KEY, price INTEGER NOT NULL);
-        CREATE TABLE customers (customer_id TEXT PRIMARY KEY, insert_date TEXT NOT NULL, birth_date TEXT NOT NULL);
-        CREATE TABLE orders (date TEXT NOT NULL, order_id TEXT NOT NULL, customer_id TEXT NOT NULL, product_id TEXT NOT NULL, quantity_product INTEGER NOT NULL);
-        INSERT INTO product VALUES ('a', 1);
-        -- Reference / order date: 2026-09-25
-        -- Bit 0 (100 cts) K1: born 2001-09-25 (turns 25 today, Cohort 1)     -> MUST INCLUDE
-        -- Bit 1 (200 cts) K2: born 2000-09-26 (turns 26 tomorrow, Cohort 2)  -> MUST INCLUDE
-        -- Bit 2 (400 cts) K3: born 2000-09-25 (turns 26 today, aged 26)      -> MUST EXCLUDE
-        -- Bit 3 (800 cts) K4: born 2001-09-26 (turns 25 tomorrow, aged 24)   -> MUST EXCLUDE
-        INSERT INTO customers VALUES
-            ('K1', '2025-01-01 00:00:00', '2001-09-25'),
-            ('K2', '2025-01-01 00:00:00', '2000-09-26'),
-            ('K3', '2025-01-01 00:00:00', '2000-09-25'),
-            ('K4', '2025-01-01 00:00:00', '2001-09-26');
-        INSERT INTO orders VALUES
-            ('2026-09-25 12:00:00', 'O1', 'K1', 'a', 100),
-            ('2026-09-25 12:00:00', 'O2', 'K2', 'a', 200),
-            ('2026-09-25 12:00:00', 'O3', 'K3', 'a', 400),
-            ('2026-09-25 12:00:00', 'O4', 'K4', 'a', 800);
-    """)
+    canary_0925 = build_canary_db("2026-09-25", "2001-09-25", "2000-09-26", "2000-09-25", "2001-09-26")
+    canary_1201 = build_canary_db("2026-12-01", "2001-12-01", "2000-12-02", "2000-12-01", "2001-12-02")
+
     bitmask_diagnosis = {
         300: "PASS (K1+K2 = 300: exact completed-age window)",
         0: "REJECT [0]: empty-set bug (all 4 boundary customers excluded)",
-        100: "REJECT [K1 only = 100]: missed Cohort 2 (K2 born 2000 before birthday)",
+        100: "REJECT [K1 only = 100]: single-day or missed Cohort 2 (K2 born 26y ago before birthday)",
         600: "REJECT [K2+K3 = 600]: off-by-one birthday boundary (missed K1, included K3 aged 26)",
         1100: "REJECT [K1+K2+K4 = 1100]: missing lower age bound (included K4 aged 24)",
         1500: "REJECT [K1+K2+K3+K4 = 1500]: missing lower age bound (included all customers <= 25)",
     }
+
+    print("  [Canary calibrated for reference/order date 2026-09-25: C02 & C10]")
     for label, cid, mod_key in [
         ("C02 Reference SQL", "C02", None),
         ("C02 B (gpt-oss-20b)", "C02", ("groq", "openai/gpt-oss-20b")),
         ("C02 C (north-mini-code)", "C02", ("openrouter", "cohere/north-mini-code:free")),
         ("C02 E (dots-3-note)", "C02", ("openrouter", "dots-studio/dots-3-note-preview:free")),
-        ("C08 C (north-mini-code)", "C08", ("openrouter", "cohere/north-mini-code:free")),
         ("C10 Reference SQL", "C10", None),
         ("C10 D (qwen3.8-27b)", "C10", ("groq", "qwen/qwen3.8-27b")),
         ("C10 E (dots-3-note)", "C10", ("openrouter", "dots-studio/dots-3-note-preview:free")),
     ]:
         sql_to_test = references[cid]["sql"] if mod_key is None else latest_by_cell[(mod_key[0], mod_key[1], cid)]["sql"]
-        got = canary.execute(sql_to_test).fetchone()[0]
+        got = canary_0925.execute(sql_to_test).fetchone()[0]
         diag = bitmask_diagnosis.get(got, f"REJECT (got {got} != 300)")
-        print(f"  {label:26s} -> canary={got:4d} -> {diag}")
+        print(f"    {label:24s} -> canary={got:4d} -> {diag}")
+
+    print("\n  [Canary calibrated for reference date 2026-12-01: DEMO-SQL-C11]")
+    for label, sql_to_test in [
+        ("C11 Reference SQL", references["C11"]["sql"]),
+        ("C11 Pilot M1 (20b)", q_m1),
+        ("C11 Pilot M2 (cohere)", q_m2),
+    ]:
+        got = canary_1201.execute(sql_to_test).fetchone()[0]
+        diag = bitmask_diagnosis.get(got, f"REJECT (got {got} != 300)")
+        print(f"    {label:24s} -> canary={got:4d} -> {diag}")
 
 
 if __name__ == "__main__":

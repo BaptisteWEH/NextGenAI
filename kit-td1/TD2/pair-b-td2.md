@@ -1,27 +1,32 @@
 # TD 2, Pair B: wrong consensus and SQL delta diagnosis
 
-Section of `reports/td2.md` for Step 2, written by Pair B. No model was called in this step: all analyses run offline on the stored TD 1 traces (`../TD1/traces-td1.csv`), independent references (`../TD1/reference-td1.csv`) and the shop database (`../data/boutique.sqlite`, opened read-only).
+Section of `reports/td2.md` for Step 2, written by Pair B (Timothée Barselo and Baptiste Wehry). No model was called in this step: all analyses run deterministically offline on the stored TD 1 traces (`../TD1/traces-td1.csv`), independent references (`../TD1/reference-td1.csv`) and the shop database (`../data/boutique.sqlite`, opened strictly read-only via `mode=ro` and `PRAGMA query_only = 1`).
 
-## Files
+## Files and Reproducibility
 
 | File | What it is |
 |---|---|
-| [pair-b-td2.md](pair-b-td2.md) | Full Step 2 report section (identification, 2-of-3 vs 3-of-5 quorum verdicts, SQL clause diagnosis, delta queries and binary-bitmask canary check) |
-| [pair_b_wrong_consensus.py](pair_b_wrong_consensus.py) | Scans all 100 TD 1 cells for shared wrong values, evaluates 2-of-3 and 3-of-5 quorums, executes the reference/faulty/delta SQL queries on `boutique.sqlite`, and runs the 4-row binary-bitmask canary check |
-| [delta-c02-td2.csv](delta-c02-td2.csv) | Customer-by-customer delta output on `C02` (`590320` cents missed by `gpt-oss-20b`, `north-mini-code:free` and `dots-3-note-preview:free`) |
-| [delta-c10-td2.csv](delta-c10-td2.csv) | Customer-by-customer delta output on `C10` (`119410` cents counted vs `439570` cents missed by `qwen3.8-27b` and `dots-3-note-preview:free`, summing to `558980` cents) |
+| [pair_b_wrong_consensus.py](pair_b_wrong_consensus.py) | Standalone, zero-dependency verification script: scans all 100 TD 1 cells, evaluates 2-of-3 and 3-of-5 quorums (dynamically loading Pair A's `Orchestrateur.vote_k_sur_n` with automated contract assertions), executes reference/faulty/delta SQL queries on `boutique.sqlite`, and runs a date-parameterized 4-row binary-bitmask canary check |
+| [delta-c02-td2.csv](delta-c02-td2.csv) | Customer-by-customer delta output on `C02` (`590320` cents missed by `gpt-oss-20b`, `north-mini-code:free` and `dots-3-note-preview:free`, reconciling 100 % of the gap with `0`) |
+| [delta-c10-td2.csv](delta-c10-td2.csv) | Customer-by-customer delta output on `C10` (`119410` cents counted vs `439570` cents missed by `qwen3.8-27b` and `dots-3-note-preview:free`, reconciling to `558980` cents) |
+| [review-pair-b-by-pair-a.md](review-pair-b-by-pair-a.md) | Peer cross-review of Step 2 by Pair A (approved; all clarifications integrated below) |
+| [review-pair-b-by-pair-c.md](review-pair-b-by-pair-c.md) | Peer cross-review of Step 2 by Pair C (approved; all 6 recommendations integrated below) |
 
-To replay from `kit-td1/TD2/`:
+To replay the entire Step 2 verification and regenerate both CSV artefacts from `kit-td1/TD2/`:
 
 ```bash
 python3 pair_b_wrong_consensus.py --export-csv
 ```
 
+Every numerical figure in this document is enforced by `assert` statements in `pair_b_wrong_consensus.py` against `boutique.sqlite` and `reference-td1.csv`.
+
 ---
 
 ## 1. Exhaustive scan of our 100 TD 1 cells across all five models
 
-Scanning the latest attempt of all 100 cells (`20 questions × 5 models`, `nature = real`) in [../TD1/traces-td1.csv](../TD1/traces-td1.csv) reveals **two real batch questions** where at least two models return the exact same wrong value (`verdict = incorrect` with identical integer `value`):
+Scanning the latest attempt of all 100 cells (`20 questions × 5 models`, `nature = real`) in [../TD1/traces-td1.csv](../TD1/traces-td1.csv) identifies **two real batch questions** where at least two models return the exact same wrong value (`verdict = incorrect` with identical integer `value`).
+
+Only **`C02` is a wrong consensus** (and only for the 3-of-5 quorum, while the fixed 2-of-3 panel outvotes the wrong value). **`C10` is a shared wrong value that both quorums refuse** by abstaining. All quorum verdicts follow the Step 1 strict-majority contract (failed/invalid calls remain in $n$ without voting) and match Pair A's twenty-decision table across all 20 questions.
 
 | Case ID | Question family | Independent reference ([../TD1/reference-td1.csv](../TD1/reference-td1.csv)) | Shared wrong value | Agreeing models (`verdict = incorrect`) | Fixed 2-of-3 panel verdict (`atelier-vote.py`, $k=2, n=3$) | Full 3-of-5 quorum verdict (all 5 TD 1 models, $k=3, n=5$) |
 |---|---|---:|---:|---|---|---|
@@ -30,7 +35,7 @@ Scanning the latest attempt of all 100 cells (`20 questions × 5 models`, `natur
 
 ---
 
-## 2. Primary Real Batch Case 1 — Question `C02` (Shared wrong value `0` cents; wins 3-of-5, outvoted in 2-of-3)
+## 2. Wrong Consensus in the Real Batch — Question `C02` (Shared wrong value `0` cents; wins 3-of-5, outvoted in 2-of-3)
 
 ### A. Identification and quorum verdict
 - **Question identifier & nature:** `C02` (`nature = real`, TD 1 run of 2026-10-21).
@@ -65,7 +70,7 @@ Scanning the latest attempt of all 100 cells (`20 questions × 5 models`, `natur
 ### B. Faulty SQL clause diagnosis (`C02`)
 To be **25 years old in completed years on `2026-09-25`**, a customer's 25th birthday must be on or before `2026-09-25` (`birth_date <= '2001-09-25'`) and their 26th birthday must be strictly after `2026-09-25` (`birth_date > '2000-09-25'`), so **`birth_date` $\in [\text{'2000-09-26'}, \text{'2001-09-25'}]$**.
 
-Each of the three agreeing models writes a different faulty `WHERE` clause that selects **zero customers**, and `COALESCE(SUM(...), 0)` converts the empty `NULL` sum into the exact same integer **`0`**:
+Each of the three agreeing models writes a different faulty `WHERE` clause that selects **zero customers**, and `COALESCE(SUM(...), 0)` converts the empty `NULL` sum into the exact same default integer **`0`**:
 
 ```sql
 -- 1. groq:openai/gpt-oss-20b (TD1/traces-td1.csv line 23) -> returns 0
@@ -131,7 +136,7 @@ ORDER BY c.customer_id;
 
 ---
 
-## 3. Primary Real Batch Case 2 — Question `C10` (Shared non-zero wrong value `119410` cents; abstention in 2-of-3 and 3-of-5)
+## 3. Shared Non-Zero Wrong Value Refused by Both Quorums — Question `C10` (`119410` cents)
 
 ### A. Identification and quorum verdict
 - **Question identifier & nature:** `C10` (`nature = real`, TD 1 run of 2026-10-21).
@@ -233,30 +238,44 @@ ORDER BY status_in_faulty_queries, c.customer_id;
 | **Subtotal missed (Delta)** | | | | **59** | **`439570` cents** | **Accounts for exact gap (`558980 - 119410 = 439570`)** |
 | **Total reference** | | | | **73** | **`558980` cents** | **Equals `reference-td1.csv` (`558980`)** |
 
+**Consequence for the panel.** On `C02`, the fixed 2-of-3 panel is right only because the three models that return `0` are not all in it (`gpt-oss-20b` belongs to the same OpenAI maker as `gpt-oss-120b`, and `dots-3-note` is excluded). Widening the panel to 3-of-5 adds `gpt-oss-20b` and `dots-3-note`, whose empty-set queries also collapse to `0` under `COALESCE`, and the wrong value wins. Adding voters also adds their errors, so a larger $k$ is not safer by itself. On `C10`, the 2–2 tie shows that a quorum can only abstain; it cannot tell which side is right. For age questions, the vote has to be followed by an independent deterministic check, not replaced by a bigger panel.
+
 ---
 
-## 4. Historical Case `DEMO-SQL-C11` & Mechanism `DEMO-VOTE` (kept separate from batch counts)
+## 4. Instructor-Supplied Historical Case `DEMO-SQL-C11` & Mechanism `DEMO-VOTE` (kept separate from batch counts)
 
-- **`DEMO-SQL-C11` (`nature = historical pilot`, reference `446690` cents on `C11`):**
+- **`DEMO-SQL-C11` (instructor-supplied historical case from the September 2026 pilot batch, kept strictly separate from our measured TD 1 batch counts; reference `446690` cents on `C11`):**
   - `M1` (`openai/gpt-oss-20b`, `WHERE c.birth_date = '2001-12-01'`) tests a single birth date instead of the 365-day window `['2000-12-02', '2001-12-01']` $\rightarrow$ returns `0`.
   - `M2` (`cohere/north-mini-code:free`, `WHERE '2026-12-01' >= c.birth_date AND '2027-12-01' <= c.birth_date`) tests an impossible interval (`<= 2026-12-01` and `>= 2027-12-01`) without subtracting 25 years $\rightarrow$ returns `0`.
   - Delta query on `boutique.sqlite` recovers the 6 customers (`C001` = `135000`, `C002` = `25920`, `C003` = `47900`, `C006` = `77450`, `C008` = `99090`, `C009` = `61330`), summing to **`446690` cents**.
-- **`DEMO-VOTE` (`nature = simulation`, one-row toy table `sales('2026-01-01', 100)`):**
-  - Two proposals use `sale_date > '2026-01-01'` (`0` cents) and one uses `sale_date >= '2026-01-01'` (`100` cents). The 2-of-3 quorum returns `0` (`2/3` votes) against reference `100`.
+- **`DEMO-VOTE` (`nature = simulation`, constructed teaching material on a one-row toy table `sales('2026-01-01', 100)`, never presented as model outputs or counted with batch results):**
+  - Proposals are labeled `synthetic:P1`, `synthetic:P2` (`sale_date > '2026-01-01'` $\rightarrow$ `0` cents) and `synthetic:P3` (`sale_date >= '2026-01-01'` $\rightarrow$ `100` cents). The 2-of-3 quorum returns `0` (`2/3` votes from `synthetic:P1` and `synthetic:P2`) against reference `100`.
 
 ---
 
-## 5. Checking Policy: Binary-Bitmask Canary Test (`100, 200, 400, 800` cents)
+## 5. Checking Policy: Binary-Bitmask Canary Test (`100, 200, 400, 800` cents) and Its Limits
 
-In production, no reference value exists on `boutique.sqlite`, and calling a stronger model is not a check (Lecture 2, Slides 22–23 & 26). To detect shared SQL errors deterministically by code **before** counting a model's vote, `pair_b_wrong_consensus.py` runs each generated SQL query against an in-memory 4-customer **binary-bitmask canary table** around the reference date (`2026-09-25`):
+In production, no reference value exists on `boutique.sqlite`, and calling a stronger model is not a check (Lecture 2, slides 8, 9 and 11). To detect shared SQL age-window errors deterministically by code **before** counting a model's vote, `pair_b_wrong_consensus.py` implements `build_canary_db(ref_date, ...)`, which runs each generated SQL query against an in-memory 4-customer **binary-bitmask canary table** calibrated for the question's reference date (`2026-09-25` for `C02` and `C10`, and `2026-12-01` for `DEMO-SQL-C11`):
 
-- **Bit 0 (`100` cts) — `K1` (`2001-09-25`):** turns 25 today (Cohort 1) $\rightarrow$ **must include**.
-- **Bit 1 (`200` cts) — `K2` (`2000-09-26`):** turns 26 tomorrow (Cohort 2) $\rightarrow$ **must include**.
-- **Bit 2 (`400` cts) — `K3` (`2000-09-25`):** turns 26 today (aged 26) $\rightarrow$ **must exclude**.
-- **Bit 3 (`800` cts) — `K4` (`2001-09-26`):** turns 25 tomorrow (aged 24) $\rightarrow$ **must exclude**.
+- **Bit 0 (`100` cts) — `K1`:** turns 25 on the reference date (`2001-09-25` or `2001-12-01`, Cohort 1) $\rightarrow$ **must include**.
+- **Bit 1 (`200` cts) — `K2`:** turns 26 the day after the reference date (`2000-09-26` or `2000-12-02`, Cohort 2) $\rightarrow$ **must include**.
+- **Bit 2 (`400` cts) — `K3`:** turns 26 on the reference date (`2000-09-25` or `2000-12-01`, aged 26) $\rightarrow$ **must exclude**.
+- **Bit 3 (`800` cts) — `K4`:** turns 25 the day after the reference date (`2001-09-26` or `2001-12-02`, aged 24) $\rightarrow$ **must exclude**.
 
-Because the four amounts are powers of two (`100, 200, 400, 800`), **only a query that selects `K1 + K2` returns `300`**, and any other sum uniquely identifies the faulty SQL boundary:
-- `300` (`K1 + K2`) $\rightarrow$ **PASS** (`C02` and `C10` reference SQL).
-- `0` ($\emptyset$) $\rightarrow$ **REJECT** (catches `C02` B, C, E and `DEMO-SQL-C11` M1, M2).
-- `100` (`K1` only) $\rightarrow$ **REJECT: missed Cohort 2** (catches `C10` D and E).
-- `1500` (`K1 + K2 + K3 + K4`) $\rightarrow$ **REJECT: missing lower age bound** (catches `C08` C).
+Because the four amounts are powers of two (`100, 200, 400, 800`), **only a query that selects `K1 + K2` returns `300`**, and any other sum diagnoses which boundary failed on the executed queries:
+- **`300` (`K1 + K2`) $\rightarrow$ PASS:** `C02` reference SQL, `C10` reference SQL, and `C11` reference SQL.
+- **`0` ($\emptyset$) $\rightarrow$ REJECT (empty-set bug):** catches all three faulty queries on `C02` (`gpt-oss-20b`, `north-mini-code`, `dots-3-note`) and `DEMO-SQL-C11` query `M2` (`north-mini-code`).
+- **`100` (`K1` only) $\rightarrow$ REJECT (single-day or missed Cohort 2):** catches both faulty queries on `C10` (`qwen3.8-27b` and `dots-3-note`) and `DEMO-SQL-C11` query `M1` (`gpt-oss-20b`, which only matches `birth_date = '2001-12-01'`).
+
+**Limits of the canary.** The canary is a targeted candidate check, not a general SQL correctness guarantee. It only tests the age window around one specific reference date with four synthetic boundary customers. A query with a wrong join, a wrong amount formula, a wrong period filter or duplicated rows could still return `300` on the canary while being wrong on the shop database. Moreover, it was designed after observing the completed-age errors of this batch and requires one canary table calibrated per question type and per reference date (a question on `2026-09-24` such as `C08`, or on `2026-12-01` such as `C11`, requires its own boundary dates, which adds a maintenance cost to consider in TD 3). For a customer-facing figure or a payout, the validated reference query of the family remains the check that decides.
+
+---
+
+## 6. Cross-Review Integration & Software Engineering Quality
+
+Following the internal sub-group cross-reviews by Pair A ([review-pair-b-by-pair-a.md](review-pair-b-by-pair-a.md)) and Pair C ([review-pair-b-by-pair-c.md](review-pair-b-by-pair-c.md)), all review items were integrated and verified:
+
+1. **Date-calibrated canary execution:** Removed `C08` (`2026-09-24`) from the `2026-09-25` canary and added a dedicated `2026-12-01` canary instance that executes `DEMO-SQL-C11` (`C11 Reference`, `M1` and `M2`) directly in `pair_b_wrong_consensus.py`.
+2. **Unified quorum implementation:** `run_k_of_n()` dynamically loads `Orchestrateur.vote_k_sur_n` from `skeleton-multi-llm-en.py` when present and asserts exact equality with the Step 1 contract.
+3. **Strict separation of natures:** Synthetic proposals in `DEMO-VOTE` are labeled `synthetic:P1..P3`, and both `DEMO-VOTE` (`simulation`) and `DEMO-SQL-C11` (instructor-supplied historical pilot case) are kept strictly separate from measured TD 1 batch counts.
+4. **Code basics & AI disclosure:** `pair_b_wrong_consensus.py` uses only the Python standard library, contains no hardcoded secrets or network calls, enforces read-only SQLite access (`mode=ro` + `PRAGMA query_only = 1`), and validates all delta sums via automated assertions. An AI coding assistant helped structure the verification script and formatting; every SQL diagnosis, trace line reference and customer delta was independently verified by Pair B on `data/boutique.sqlite`.
