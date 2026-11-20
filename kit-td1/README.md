@@ -33,8 +33,8 @@ sub-group. Read the environment guide first and finish preparation by 18 October
 | `data/manifest.json` | SHA-256 hashes of the database and of the CSV files, row counts, integrity checks. |
 | `schema.sql` | The three tables, sent to the models in the prompt. |
 | [questions-td1-en](TD1/questions-td1-en.html) | The twenty questions, without answers. |
-| `questions-td1.json` | The same questions, read by the skeleton. |
-| `reference-td1.csv` | Template of step 1 of TD 1: your reference query and its value for each question. |
+| `TD1/questions-td1.json` | The same questions, read by the skeleton. |
+| `TD1/reference-td1.csv` | Template of step 1 of TD 1: your reference query and its value for each question. |
 
 ## The code
 
@@ -42,8 +42,8 @@ sub-group. Read the environment guide first and finish preparation by 18 October
 |---|---|
 | `skeleton-multi-llm-en.py` | The orchestrator skeleton: prompt, clients, sandboxed execution, verdict, trace table, rates. The k-of-n vote is yours to write in TD 2. |
 | `sandbox_sqlite.py` | Read-only SQLite sandbox, used by the skeleton for every query a model returns. |
-| `atelier-vote.py` | Runs your vote on four synthetic examples, then on the stored traces of one question. No network. |
-| `atelier-routage.py` | Reads the decisions of a routing rule on seven scenarios with synthetic resources, then you adapt it to your own rule. No network. |
+| `TD2/atelier-vote.py` | Runs your vote on four synthetic examples, then on the stored traces of one question. No network. |
+| `TD2/atelier-routage.py` | Reads the decisions of a routing rule on seven scenarios with synthetic resources, then you adapt it to your own rule. No network. |
 
 ## Reading a portfolio and a cost
 
@@ -57,8 +57,8 @@ sub-group. Read the environment guide first and finish preparation by 18 October
 
 | File | Role |
 |---|---|
-| `model-question-comparison-en.csv` | One final result per model/question, verdict, explanation and raw-trace pointer; display its pivot matrix. |
-| `five-model-summary-en.csv` | Five models, documented index and prices, access and results by family. |
+| `TD1/model-question-comparison-en.csv` | One final result per model/question, verdict, explanation and raw-trace pointer; display its pivot matrix. |
+| `TD1/five-model-summary-en.csv` | Five models, documented index and prices, access and results by family. |
 | [comparison-example-en](TD1/comparison-example-en.html) | Column definitions and a fictional presentation example, unrelated to lab answers. |
 
 ## Inventory
@@ -73,9 +73,9 @@ sub-group. Read the environment guide first and finish preparation by 18 October
 cd kit-td1
 python3 check_access.py                       # Python, database hash, one probe per authorised model
 python3 skeleton-multi-llm-en.py --demo       # the whole chain on three simulated models, no key, no network
-python3 atelier-routage.py                    # the seven routing scenarios, no network
+python3 TD2/atelier-routage.py                # the seven routing scenarios, no network
 ```
 
-Then step 1 of [enonce-td1-en](TD1/enonce-td1-en.html): fill in `reference-td1.csv`. Step 2 uses the allocation and `--models` / `--cases` commands in the assignment. The base batch is 100 cells (60 Groq, 40 OpenRouter); controls and retries are separate, with at most one retry per cell. Each operator checks their own allowance. Keep the CSV and JSONL attempts.
+Then step 1 of [enonce-td1-en](TD1/enonce-td1-en.html): fill in `TD1/reference-td1.csv`. Step 2 uses the allocation and `--models` / `--cases` commands in the assignment. The base batch is 100 cells (60 Groq, 40 OpenRouter); controls and retries are separate, with at most one retry per cell. Each operator checks their own allowance. Keep the CSV and JSONL attempts.
 
 The assessment sheet, the hand-in page and the hand-in templates are one folder above this runnable kit. [Before TD 1](../before-td1-en.html) gives the preparation steps to follow before the first session.

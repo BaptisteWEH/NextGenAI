@@ -1,0 +1,3 @@
+# Keep the kit data byte for byte: their SHA-256 is checked against kit-td1/data/manifest.json
+kit-td1/data/*.csv -text
+kit-td1/data/*.sqlite binary

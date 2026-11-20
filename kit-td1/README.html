@@ -57,8 +57,8 @@ a.download{display:inline-flex;align-items:center;min-height:44px;padding:8px 16
 <tr><td><code>data/manifest.json</code></td><td>SHA-256 hashes of the database and of the CSV files, row counts, integrity checks.</td></tr>
 <tr><td><code>schema.sql</code></td><td>The three tables, sent to the models in the prompt.</td></tr>
 <tr><td><a href="TD1/questions-td1-en.html">questions-td1-en</a></td><td>The twenty questions, without answers.</td></tr>
-<tr><td><code>questions-td1.json</code></td><td>The same questions, read by the skeleton.</td></tr>
-<tr><td><code>reference-td1.csv</code></td><td>Template of step 1 of TD 1: your reference query and its value for each question.</td></tr>
+<tr><td><code>TD1/questions-td1.json</code></td><td>The same questions, read by the skeleton.</td></tr>
+<tr><td><code>TD1/reference-td1.csv</code></td><td>Template of step 1 of TD 1: your reference query and its value for each question.</td></tr>
 </tbody>
 </table></div>
 <h2 id="section-5">The code</h2>
@@ -69,8 +69,8 @@ a.download{display:inline-flex;align-items:center;min-height:44px;padding:8px 16
 <tbody>
 <tr><td><code>skeleton-multi-llm-en.py</code></td><td>The orchestrator skeleton: prompt, clients, sandboxed execution, verdict, trace table, rates. The k-of-n vote is yours to write in TD 2.</td></tr>
 <tr><td><code>sandbox_sqlite.py</code></td><td>Read-only SQLite sandbox, used by the skeleton for every query a model returns.</td></tr>
-<tr><td><code>atelier-vote.py</code></td><td>Runs your vote on four synthetic examples, then on the stored traces of one question. No network.</td></tr>
-<tr><td><code>atelier-routage.py</code></td><td>Reads the decisions of a routing rule on seven scenarios with synthetic resources, then you adapt it to your own rule. No network.</td></tr>
+<tr><td><code>TD2/atelier-vote.py</code></td><td>Runs your vote on four synthetic examples, then on the stored traces of one question. No network.</td></tr>
+<tr><td><code>TD2/atelier-routage.py</code></td><td>Reads the decisions of a routing rule on seven scenarios with synthetic resources, then you adapt it to your own rule. No network.</td></tr>
 </tbody>
 </table></div>
 <h2 id="section-6">Reading a portfolio and a cost</h2>
@@ -90,8 +90,8 @@ a.download{display:inline-flex;align-items:center;min-height:44px;padding:8px 16
 <tr><th>File</th><th>Role</th></tr>
 </thead>
 <tbody>
-<tr><td><code>model-question-comparison-en.csv</code></td><td>One final result per model/question, verdict, explanation and raw-trace pointer; display its pivot matrix.</td></tr>
-<tr><td><code>five-model-summary-en.csv</code></td><td>Five models, documented index and prices, access and results by family.</td></tr>
+<tr><td><code>TD1/model-question-comparison-en.csv</code></td><td>One final result per model/question, verdict, explanation and raw-trace pointer; display its pivot matrix.</td></tr>
+<tr><td><code>TD1/five-model-summary-en.csv</code></td><td>Five models, documented index and prices, access and results by family.</td></tr>
 <tr><td><a href="TD1/comparison-example-en.html">comparison-example-en</a></td><td>Column definitions and a fictional presentation example, unrelated to lab answers.</td></tr>
 </tbody>
 </table></div>
@@ -108,8 +108,8 @@ a.download{display:inline-flex;align-items:center;min-height:44px;padding:8px 16
 <pre><code>cd kit-td1
 python3 check_access.py                       # Python, database hash, one probe per authorised model
 python3 skeleton-multi-llm-en.py --demo       # the whole chain on three simulated models, no key, no network
-python3 atelier-routage.py                    # the seven routing scenarios, no network</code></pre>
-<p>Then step 1 of <a href="TD1/enonce-td1-en.html">enonce-td1-en</a>: fill in <code>reference-td1.csv</code>. Step 2 uses the allocation and <code>--models</code> / <code>--cases</code> commands in the assignment. The base batch is 100 cells (60 Groq, 40 OpenRouter); controls and retries are separate, with at most one retry per cell. Each operator checks their own allowance. Keep the CSV and JSONL attempts.</p>
+python3 TD2/atelier-routage.py                # the seven routing scenarios, no network</code></pre>
+<p>Then step 1 of <a href="TD1/enonce-td1-en.html">enonce-td1-en</a>: fill in <code>TD1/reference-td1.csv</code>. Step 2 uses the allocation and <code>--models</code> / <code>--cases</code> commands in the assignment. The base batch is 100 cells (60 Groq, 40 OpenRouter); controls and retries are separate, with at most one retry per cell. Each operator checks their own allowance. Keep the CSV and JSONL attempts.</p>
 <p>The assessment sheet, the hand-in page and the hand-in templates are one folder above this runnable kit. <a href="../before-td1-en.html">Before TD 1</a> gives the preparation steps to follow before the first session.</p></main><footer>Didier Parisot · ESILV · Pack 2026-10-14-students-1.</footer><script>
 (()=>{'use strict';const header=document.querySelector('header'),button=document.getElementById('header-toggle');
 const key='esilv-beta-header:'+location.pathname;let saved=null;try{saved=localStorage.getItem(key)}catch(e){}

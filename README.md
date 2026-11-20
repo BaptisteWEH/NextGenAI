@@ -22,6 +22,28 @@ DIA3-3
 
 `kit-td1/data/boutique.sqlite`, SHA-256 `0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2`
 
+## How to read this repository
+
+Each TD builds on the previous one. Read in this order:
+
+1. **Setup:** [kit-td1/README.md](kit-td1/README.md). The course kit: database, questions,
+   shared skeleton, environment guide.
+2. **TD 1, comparing five models:** [kit-td1/TD1/README.md](kit-td1/TD1/README.md), which goes from
+   reference values to the batches to the consolidated traces. Report: [reports/td1.md](reports/td1.md).
+3. **TD 2, vote and routing:** [kit-td1/TD2/README.md](kit-td1/TD2/README.md). It covers the k-of-n
+   vote on the TD 1 traces, then the wrong consensus, then the routing rule and the simulator.
+   Report: [reports/td2.md](reports/td2.md).
+4. **TD 3, cost and choice of a configuration:** [kit-td1/TD3/](kit-td1/TD3/) (statement and cost
+   method; work to come on 11 December).
+
+| Folder | Content |
+|---|---|
+| `kit-td1/` | Shared kit files: `skeleton-multi-llm-en.py` (with our `vote_k_sur_n`), `sandbox_sqlite.py`, `data/`, `check_access.py` |
+| `kit-td1/TD1/`, `TD2/`, `TD3/` | Statement, our code and our evidence for each session |
+| `reports/` | One session report per TD |
+| `templates/` | Blank hand-in forms from the kit |
+| `lectures/` | Course slides |
+
 ## Environment
 
 Python 3.12, `requests`; free Groq and OpenRouter accounts; keys in the environment variables
@@ -29,13 +51,13 @@ Python 3.12, `requests`; free Groq and OpenRouter accounts; keys in the environm
 
 ## Commands
 
-From `kit-td1/`:
+TD 1, from `kit-td1/` (the run step needs the API keys; its outputs are stored in `TD1/`):
 
 ```bash
 python -m pip install -r requirements.txt
 python check_access.py --no-network
 python TD1/build_reference_td1.py
-python skeleton-multi-llm-en.py --run --models <provider:model> --state state-X.jsonl --out traces-X.csv
+python skeleton-multi-llm-en.py --run --models <provider:model> --state TD1/state-X.jsonl --out TD1/traces-X.csv
 python TD1/build_step3_td1.py
 ```
 
