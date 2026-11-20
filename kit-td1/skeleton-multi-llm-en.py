@@ -625,7 +625,47 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        def field(proposal, name):
+            # Accept both objects (SimpleNamespace, dataclass) and plain dicts.
+            if isinstance(proposal, dict):
+                return proposal.get(name)
+            return getattr(proposal, name, None)
+
+        # n counts every member of the panel, voting or not: an error or an
+        # unavailable model stays in n and only lacks a vote.
+        n = len(traces_question)
+
+        # Rule 2: k must be a strict majority of n (this also rejects n == 0).
+        if not (n // 2 < k <= n):
+            raise ValueError(f"k={k} is not a strict majority of n={n}: need {n // 2} < k <= {n}")
+
+        # Rule 3: one (provider, model_requested) pair = one vote, never two.
+        seen = set()
+        for proposal in traces_question:
+            member = (field(proposal, "provider"), field(proposal, "model_requested"))
+            if member in seen:
+                raise ValueError(f"duplicate proposal for {member[0]}:{member[1]}: a duplicate is not a second vote")
+            seen.add(member)
+
+        # Rule 1: only executed proposals that carry a value vote. `is not None`
+        # (not truthiness): 0 cents is a legitimate value and must be counted.
+        ballots = {}
+        for proposal in traces_question:
+            value = field(proposal, "value")
+            if field(proposal, "verdict") == "executed" and value is not None:
+                name = f"{field(proposal, 'provider')}:{field(proposal, 'model_requested')}"
+                ballots.setdefault(value, []).append(name)
+
+        # Rules 4 and 5. Since k > n // 2, two distinct values cannot both reach k,
+        # so the winner (if any) is unique and no tie-break is needed.
+        if ballots:
+            value, models = max(ballots.items(), key=lambda item: len(item[1]))
+            top = len(models)
+        else:
+            value, models, top = None, [], 0
+        if top >= k:
+            return {"consensus": True, "value": value, "votes": top, "models": models}
+        return {"consensus": False, "value": None, "votes": top, "models": []}
 
 
 # ==========================================================================
